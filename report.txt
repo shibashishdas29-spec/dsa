@@ -1,0 +1,102 @@
+Campus Parking Availability Optimization Report
+
+1. Problem Statement
+Students and faculty frequently lose time searching for parking inside a campus zone because they do not know which specific spots are currently open.
+
+2. Objective
+Design and implement an efficient algorithm that returns currently available parking spots inside a requested campus area with minimal query latency.
+
+3. Data (Data fields used to build solution)
+- spot_id: Unique identifier for a parking space (example: N-101)
+- area: Logical campus zone (North, Central, South)
+- row, col: Optional physical coordinates in lot grid
+- priority_score: Lower value means preferred proximity/access
+- occupancy_status: Derived runtime state (occupied or free)
+
+4. Data Structures Used
+- Hash map (spot_by_id): spot_id -> ParkingSpot for O(1) direct lookup
+- Hash map of min-heaps (available_heap_by_area): area -> heap[(priority_score, spot_id)]
+- Hash set (occupied): contains currently occupied spot_id values for O(1) occupancy checks
+
+5. Algorithm Design
+Initialization:
+- Insert all spots into area-specific min-heaps sorted by priority_score.
+
+Operations:
+A) get_available_spots(area, k)
+- Repeatedly pop from that area's heap.
+- Skip stale entries if spot is currently occupied.
+- Collect up to k valid free spots.
+- Push valid popped spots back (to preserve future query correctness).
+
+B) occupy(spot_id)
+- Add spot_id to occupied set if valid and not already occupied.
+
+C) release(spot_id)
+- Remove spot_id from occupied set.
+- Reinsert into corresponding area heap.
+
+6. Optimization Techniques (Improvements over naive approach, Space/time trade-offs)
+Naive approach:
+- Scan every spot in area each query -> O(n_area)
+
+Optimized approach:
+- Priority heap per area + O(1) occupancy set.
+- Top candidate retrieval is O(log n_area) amortized; near O(1) when heap head is valid.
+- Query for k spots is approximately O(k log n_area) with lazy stale-skip handling.
+
+Trade-offs:
+- Extra memory for heaps and occupied set.
+- Lazy deletion may temporarily store stale heap entries; periodically compacting heaps can control growth.
+
+7. Implementation
+Language: Python 3
+Core file:
+- parking_system.py with:
+  - ParkingSpot dataclass
+  - CampusParkingIndex class
+  - operations: occupy, release, get_available_spots
+
+8. Sample Input and Output (Minimum 5 sets)
+Set 1
+Input : area=North, k=2
+Output: [N-101, N-103]
+
+Set 2
+Input : occupy(N-101), area=North, k=2
+Output: [N-103, N-102]
+
+Set 3
+Input : occupy(N-103), area=North, k=3
+Output: [N-102]
+
+Set 4
+Input : release(N-101), area=North, k=2
+Output: [N-101, N-102]
+
+Set 5
+Input : area=Central, k=5
+Output: [C-201, C-202]
+
+9. Time and Space Complexity Analysis
+Let n be total spots, and n_a be spots in requested area.
+- Build index: O(n log n_a*) total insertion cost across heaps (practically O(n log n) worst-case single area)
+- occupy: O(1)
+- release: O(log n_a)
+- get_available_spots(area, k): O((k + s) log n_a), where s is count of stale popped entries
+Best case query:
+- First heap entries are valid -> O(k log n_a); for k=1 this is near O(1) practical latency
+Space:
+- O(n) for spot map + area heaps + occupied set
+
+10. Conclusion
+The proposed indexed-heap method reduces search effort significantly compared with full scans, enabling fast and scalable parking guidance for campus users in specific areas.
+
+11. Github link (make it public with all team members as collaborators)
+Repository Link: https://github.com/<your-organization-or-user>/campus-parking-dsa
+(Replace placeholder with actual public repository URL and add all team members as collaborators.)
+
+12. References
+1) Cormen, T. H., et al., Introduction to Algorithms (Heap and Hashing concepts)
+2) Python heapq documentation: https://docs.python.org/3/library/heapq.html
+3) Python data model and set/dict performance notes: https://wiki.python.org/moin/TimeComplexity

@@ -1,0 +1,176 @@
+%PDF-1.4
+%
+1 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+2 0 obj
+<< /Length 2399 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 54 732 Tm
+14 TL
+(Campus Parking Availability Optimization Report) Tj
+T* () Tj
+T* (1. Problem Statement) Tj
+T* (Students and faculty frequently lose time searching for parking inside a campus zone because) Tj
+T* (they do not know which specific spots are currently open.) Tj
+T* () Tj
+T* (2. Objective) Tj
+T* (Design and implement an efficient algorithm that returns currently available parking spots) Tj
+T* (inside a requested campus area with minimal query latency.) Tj
+T* () Tj
+T* (3. Data \(Data fields used to build solution\)) Tj
+T* (- spot_id: Unique identifier for a parking space \(example: N-101\)) Tj
+T* (- area: Logical campus zone \(North, Central, South\)) Tj
+T* (- row, col: Optional physical coordinates in lot grid) Tj
+T* (- priority_score: Lower value means preferred proximity/access) Tj
+T* (- occupancy_status: Derived runtime state \(occupied or free\)) Tj
+T* () Tj
+T* (4. Data Structures Used) Tj
+T* (- Hash map \(spot_by_id\): spot_id -> ParkingSpot for O\(1\) direct lookup) Tj
+T* (- Hash map of min-heaps \(available_heap_by_area\): area -> heap[\(priority_score, spot_id\)]) Tj
+T* (- Hash set \(occupied\): contains currently occupied spot_id values for O\(1\) occupancy checks) Tj
+T* () Tj
+T* (5. Algorithm Design) Tj
+T* (Initialization:) Tj
+T* (- Insert all spots into area-specific min-heaps sorted by priority_score.) Tj
+T* () Tj
+T* (Operations:) Tj
+T* (A\) get_available_spots\(area, k\)) Tj
+T* (- Repeatedly pop from that area's heap.) Tj
+T* (- Skip stale entries if spot is currently occupied.) Tj
+T* (- Collect up to k valid free spots.) Tj
+T* (- Push valid popped spots back \(to preserve future query correctness\).) Tj
+T* () Tj
+T* (B\) occupy\(spot_id\)) Tj
+T* (- Add spot_id to occupied set if valid and not already occupied.) Tj
+T* () Tj
+T* (C\) release\(spot_id\)) Tj
+T* (- Remove spot_id from occupied set.) Tj
+T* (- Reinsert into corresponding area heap.) Tj
+T* () Tj
+T* (6. Optimization Techniques \(Improvements over naive approach, Space/time trade-offs\)) Tj
+T* (Naive approach:) Tj
+T* (- Scan every spot in area each query -> O\(n_area\)) Tj
+T* () Tj
+T* (Optimized approach:) Tj
+T* (- Priority heap per area + O\(1\) occupancy set.) Tj
+T* (- Top candidate retrieval is O\(log n_area\) amortized; near O\(1\) when heap head is valid.) Tj
+T* (- Query for k spots is approximately O\(k log n_area\) with lazy stale-skip handling.) Tj
+ET
+endstream
+endobj
+3 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 2 0 R >>
+endobj
+4 0 obj
+<< /Length 1670 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 54 732 Tm
+14 TL
+() Tj
+T* (Trade-offs:) Tj
+T* (- Extra memory for heaps and occupied set.) Tj
+T* (- Lazy deletion may temporarily store stale heap entries; periodically compacting heaps can) Tj
+T* (control growth.) Tj
+T* () Tj
+T* (7. Implementation) Tj
+T* (Language: Python 3) Tj
+T* (Core file:) Tj
+T* (- parking_system.py with:) Tj
+T* (  - ParkingSpot dataclass) Tj
+T* (  - CampusParkingIndex class) Tj
+T* (  - operations: occupy, release, get_available_spots) Tj
+T* () Tj
+T* (8. Sample Input and Output \(Minimum 5 sets\)) Tj
+T* (Set 1) Tj
+T* (Input : area=North, k=2) Tj
+T* (Output: [N-101, N-103]) Tj
+T* () Tj
+T* (Set 2) Tj
+T* (Input : occupy\(N-101\), area=North, k=2) Tj
+T* (Output: [N-103, N-102]) Tj
+T* () Tj
+T* (Set 3) Tj
+T* (Input : occupy\(N-103\), area=North, k=3) Tj
+T* (Output: [N-102]) Tj
+T* () Tj
+T* (Set 4) Tj
+T* (Input : release\(N-101\), area=North, k=2) Tj
+T* (Output: [N-101, N-102]) Tj
+T* () Tj
+T* (Set 5) Tj
+T* (Input : area=Central, k=5) Tj
+T* (Output: [C-201, C-202]) Tj
+T* () Tj
+T* (9. Time and Space Complexity Analysis) Tj
+T* (Let n be total spots, and n_a be spots in requested area.) Tj
+T* (- Build index: O\(n log n_a*\) total insertion cost across heaps \(practically O\(n log n\)) Tj
+T* (worst-case single area\)) Tj
+T* (- occupy: O\(1\)) Tj
+T* (- release: O\(log n_a\)) Tj
+T* (- get_available_spots\(area, k\): O\(\(k + s\) log n_a\), where s is count of stale popped entries) Tj
+T* (Best case query:) Tj
+T* (- First heap entries are valid -> O\(k log n_a\); for k=1 this is near O\(1\) practical latency) Tj
+T* (Space:) Tj
+T* (- O\(n\) for spot map + area heaps + occupied set) Tj
+T* () Tj
+T* (10. Conclusion) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 4 0 R >>
+endobj
+6 0 obj
+<< /Length 849 >>
+stream
+BT
+/F1 11 Tf
+1 0 0 1 54 732 Tm
+14 TL
+(The proposed indexed-heap method reduces search effort significantly compared with full scans,) Tj
+T* (enabling fast and scalable parking guidance for campus users in specific areas.) Tj
+T* () Tj
+T* (11. Github link \(make it public with all team members as collaborators\)) Tj
+T* (Repository Link: https://github.com/<your-organization-or-user>/campus-parking-dsa) Tj
+T* (\(Replace placeholder with actual public repository URL and add all team members as) Tj
+T* (collaborators.\)) Tj
+T* () Tj
+T* (12. References) Tj
+T* (1\) Cormen, T. H., et al., Introduction to Algorithms \(Heap and Hashing concepts\)) Tj
+T* (2\) Python heapq documentation: https://docs.python.org/3/library/heapq.html) Tj
+T* (3\) Python data model and set/dict performance notes:) Tj
+T* (https://wiki.python.org/moin/TimeComplexity) Tj
+ET
+endstream
+endobj
+7 0 obj
+<< /Type /Page /Parent 8 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 1 0 R >> >> /Contents 6 0 R >>
+endobj
+8 0 obj
+<< /Type /Pages /Kids [ 3 0 R 5 0 R 7 0 R ] /Count 3 >>
+endobj
+9 0 obj
+<< /Type /Catalog /Pages 8 0 R >>
+endobj
+xref
+0 10
+0000000000 65535 f 
+0000000015 00000 n 
+0000000085 00000 n 
+0000002536 00000 n 
+0000002662 00000 n 
+0000004384 00000 n 
+0000004510 00000 n 
+0000005410 00000 n 
+0000005536 00000 n 
+0000005607 00000 n 
+trailer
+<< /Size 10 /Root 9 0 R >>
+startxref
+5656
+%%EOF
